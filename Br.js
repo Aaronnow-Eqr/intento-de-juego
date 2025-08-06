@@ -145,11 +145,6 @@ function numero_aleatorio(numero) {
   return Math.floor(Math.random() * numero);
 }
 
-function verificar_mision(personajes) {
-  let vivos = personajes.filter(p => p.vida > 0);
-  return vivos.length > 1;
-}
-
 let ronda = 1;
 let personajes = [operador_1, operador_2, operador_3];
 
@@ -170,7 +165,7 @@ do {
     let daño = numero_aleatorio(atacante.ataque) - numero_aleatorio(defensor.defensa);
     if (daño < 0) daño = 0;
     defensor.vida -= daño;
-    console.log(`Impacto directo: ${daño} de daño. Vida restante de ${defensor.nombre}: ${defensor.vida}`);
+    console.log(`Impacto directo: ${daño} de daño vida restante de ${defensor.nombre}: ${defensor.vida}`);
     if (defensor.vida <= 0) {
       console.log(`--==+ ${defensor.nombre} ha sido neutralizado +==--`);
     }
@@ -189,6 +184,11 @@ do {
   ronda++;
 
 } while (verificar_mision(personajes));
+
+function verificar_mision(personajes) {
+  let vivos = personajes.filter(p => p.vida > 0);
+  return vivos.length > 1;
+}
 
 let ganador = personajes.find(p => p.vida > 0);
 console.log(`-=!! Misión terminada !!=-`);
