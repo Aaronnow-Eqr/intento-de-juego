@@ -78,117 +78,129 @@
   - Agrega la posibilidad de 1 entre 10 de que un personaje se tropiece y no pueda hacer nada en esa ronda.
 */
 
-let operador_1 = {
-  nombre: "Alpha",
-  defensa: 25,
-  ataque: 120,
-  vida: 1000,
-  equipo: [
-    {
-      nombre: "rifle de asalto",
-      ataque: 210,
-    },
-    {
-      nombre: "granada",
-      ataque: 240,
-    },
-    {
-      nombre: "rifle francotirador",
-      ataque: 235,
-    },
-  ],
-};
-
-let operador_2 = {
-  nombre: "Delta",
-  defensa: 30,
-  ataque: 125,
-  vida: 1000,
-  equipo: [
-    {
-      nombre: "escopeta",
-      ataque: 220,
-    },
-    {
-      nombre: "granada de fragmentación",
-      ataque: 255,
-    },
-    {
-      nombre: "subfusil",
-      ataque: 190,
-    },
-  ],
-};
-
-let operador_3 = {
-  nombre: "Bravo",
-  defensa: 15,
-  ataque: 115,
-  vida: 1000,
-  equipo: [
-    {
-      nombre: "ametralladora ligera",
-      ataque: 215,
-    },
-    {
-      nombre: "mina terrestre",
-      ataque: 260,
-    },
-    {
-      nombre: "pistola",
-      ataque: 180,
-    },
-  ],
-};
-
-function numero_aleatorio(numero) {
-  return Math.floor(Math.random() * numero);
-}
-
-let ronda = 1;
-let personajes = [operador_1, operador_2, operador_3];
-
-do {
-  console.log(`-=-=-=- RONDA ${ronda} -=-=-=-`);
-
-  let vivos = personajes.filter(p => p.vida > 0);
-  let atacante = vivos[numero_aleatorio(vivos.length)];
-  let defensor;
-  do {
-    defensor = vivos[numero_aleatorio(vivos.length)];
-  } while (defensor.nombre === atacante.nombre);
-
-  let accion = numero_aleatorio(2);
-
-  if (accion === 0) {
-    console.log(`${atacante.nombre} realiza un ataque cuerpo a cuerpo a ${defensor.nombre}`);
-    let daño = numero_aleatorio(atacante.ataque) - numero_aleatorio(defensor.defensa);
-    if (daño < 0) daño = 0;
-    defensor.vida -= daño;
-    console.log(`Impacto directo: ${daño} de daño vida restante de ${defensor.nombre}: ${defensor.vida}`);
-    if (defensor.vida <= 0) {
-      console.log(`--==+ ${defensor.nombre} ha sido neutralizado +==--`);
-    }
-  } else {
-    let arma = atacante.equipo[numero_aleatorio(atacante.equipo.length)];
-    console.log(`${atacante.nombre} utiliza ${arma.nombre} contra ${defensor.nombre}`);
-    let daño = numero_aleatorio(arma.ataque) - numero_aleatorio(defensor.defensa);
-    if (daño < 0) daño = 0;
-    defensor.vida -= daño;
-    console.log(`Daño infligido con ${arma.nombre}: ${daño}. Vida restante de ${defensor.nombre}: ${defensor.vida}`);
-    if (defensor.vida <= 0) {
-      console.log(`--==+ ${defensor.nombre} ha sido eliminado +==--`);
-    }
+class Personaje {
+  constructor(nombre, vida, daño, defensa, velocidad) {
+    this.nombre = nombre;
+    this.vida = vida;
+    this.daño = daño;
+    this.defensa = defensa;
+    this.velocidad = velocidad;
   }
 
-  ronda++;
-
-} while (verificar_mision(personajes));
-
-function verificar_mision(personajes) {
-  let vivos = personajes.filter(p => p.vida > 0);
-  return vivos.length > 1;
+  atacar() {
+    return Math.floor(Math.random() * this.daño + 1);
+  }
+  defenderse() {
+    return Math.floor(Math.random() * this.defensa + 1);
+  }
 }
 
+//clase para aquero
+
+class Arquero extends Personaje {
+  constructor(nombre, vida, daño, defensa, velocidad) {
+    super(nombre, vida, daño, defensa, velocidad);
+    this.flechas = ["Flecha de fuego", "Flecha explosiva"];
+  }
+
+  disparar() {
+    const flecha = this.flechas[Math.floor(Math.random() * this.flechas.length)];
+    console.log(`${this.nombre} dispara una ${flecha}.`);
+  }
+}
+
+// Clase para guerrero
+class Guerrero extends Personaje {
+  constructor(nombre, vida, daño, defensa, velocidad) {
+    super(nombre, vida, daño, defensa, velocidad);
+    this.armas = ["Espada", "Hacha"];
+  }
+
+  usar_arma() {
+    const arma = this.armas[Math.floor(Math.random() * this.armas.length)];
+    console.log(`${this.nombre} ataca con su ${arma}.`);
+  }
+}
+
+// Clase para mago
+class Mago extends Personaje {
+  constructor(nombre, vida, daño, defensa, velocidad) {
+    super(nombre, vida, daño, defensa, velocidad);
+    this.hechizos = ["Bola de fuego", "rayo"];
+  }
+
+  lanzar_hechizo() {
+    const hechizo = this.hechizos[Math.floor(Math.random() * this.hechizos.length)];
+    console.log(`${this.nombre} lanza un ${hechizo}.`);
+  }
+}
+
+let guerrero1 = new Guerrero("Guerrero1", 100, 20, 10, 5);
+let guerrero2 = new Guerrero("Guerrero2", 120, 25, 15, 6);
+let mago1 = new Mago("Mago1", 80, 15, 5, 7);
+let mago2 = new Mago("Mago2", 90, 18, 8, 4);
+let arquero1 = new Arquero("Arquero1", 110, 22, 12, 8);
+
+let personajes = [guerrero1, guerrero2, mago1, mago2, arquero1];
+
+personajes.forEach(personaje => {
+  console.log(`Hola, soy ${personaje.nombre} y soy un ${personaje.constructor.name}.`);
+});
+
+let ronda = 1;
+
+//filtrar personajes que sigan vivos
+while (personajes.filter(p => p.vida > 0).length > 1) { 
+  console.log(`-=-=-=- RONDA ${ronda} -=-=-=-`);
+  let vivos = personajes.filter(p => p.vida > 0);
+  vivos.sort((a, b) => b.velocidad - a.velocidad);
+
+  for (let atacante of vivos) {
+    if (atacante.vida <= 0) continue;
+
+    let defensor;
+    do {
+      defensor = vivos[Math.floor(Math.random() * vivos.length)];
+    } while (defensor.nombre === atacante.nombre || defensor.vida <= 0);
+
+    let accion = Math.random();
+    if (accion < 0.33) {
+      console.log(`${atacante.nombre} ataca con sus puños a ${defensor.nombre}.`);
+      let daño = atacante.atacar();
+      let defensa = defensor.defenderse();
+      if (defensa >= daño) {
+        console.log(`El ataque de ${atacante.nombre} ha fallado.`);
+      } else {
+        defensor.vida -= (daño - defensa);
+        console.log(`${atacante.nombre} ha infligido ${daño - defensa} de daño a ${defensor.nombre}. Vida restante: ${defensor.vida}`);
+        if (defensor.vida <= 0) {
+          console.log(`--==+ ${defensor.nombre} ha muerto y no puede atacar más +==--`);
+        }
+      }
+    } else {
+      if (atacante instanceof Guerrero) {
+        atacante.usar_arma();
+      } else if (atacante instanceof Mago) {
+        atacante.lanzar_hechizo();
+      } else if (atacante instanceof Arquero) {
+        atacante.disparar();
+      }
+
+      let daño = atacante.atacar() + 10;
+      let defensa = defensor.defenderse();
+      if (defensa >= daño) {
+        console.log(`El ataque de ${atacante.nombre} ha fallado.`);
+      } else {
+        defensor.vida -= (daño - defensa);
+        console.log(`${atacante.nombre} ha infligido ${daño - defensa} de daño a ${defensor.nombre}. Vida restante: ${defensor.vida}`);
+        if (defensor.vida <= 0) {
+          console.log(`--==+ ${defensor.nombre} ha muerto y no puede atacar más +==--`);
+        }
+      }
+    }
+  }
+  ronda++;
+}
 let ganador = personajes.find(p => p.vida > 0);
-console.log(`-=!! Misión terminada !!=-`);
+console.log(`-=!! El ganador es ${ganador.nombre} !!=-`);
+
